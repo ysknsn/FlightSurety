@@ -10,7 +10,6 @@
 </head>
 
 <body>
-
     <nav class="navbar navbar-expand-md navbar-dark bg-dark fixed-top">
         <a class="navbar-brand" href="#">FlightSurety</a>
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarsExampleDefault" aria-controls="navbarsExampleDefault"
@@ -25,6 +24,30 @@
         </div>
         <div class="row top-20">
             <label class="form">Flight</label> <input type="text" id="flight-number"> <btn class="btn btn-primary" id="submit-oracle">Submit to Oracles</btn>
+        </div>
+
+        <div class="row top-20">
+            <h2>Purchase Flight Insurance  </h2>
+            <select name="flight-number" id="flight-number">
+                <option value="Flight1">Flight1</option>
+                <option value="Flight2">Flight2</option>
+                <option value="Flight3">Flight3</option>
+                <option value="Flight4">Flight4</option>
+                <option value="Flight5">Flight5</option>
+                <option value="Flight6">Flight6</option>
+                <option value="Flight7">Flight7</option>
+                <option value="Flight8">Flight8</option>
+                <option value="Flight9">Flight9</option>
+                <option value="Flight10">Flight10</option>
+            </select>
+            <input type="number" id="eth-value" value="1" min="1">
+            <button id=purchase-flight-insurance>Purchase</button>
+        </div>
+
+        <div class="row top-20">
+            <h2>Claim Repayment  </h2>
+            <input type="text" id="flight-address" placeholder="flight address">
+            <button id=claim-repayment>Claim</button>
         </div>
     </main>
 

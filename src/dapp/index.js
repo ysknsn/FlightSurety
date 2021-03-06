@@ -25,7 +25,42 @@ import './flightsurety.css';
                 display('Oracles', 'Trigger oracles', [ { label: 'Fetch Flight Status', error: error, value: result.flight + ' ' + result.timestamp} ]);
             });
         })
-    
+
+
+        DOM.elid('purchase-flight-insurance').addEventListener('click', () => {
+            console.log("purchase-flight-insurance");
+            // Passenger Airline Choice
+            // Passengers can choose from a fixed list of flight numbers and departure that are defined in the Dapp client
+            let flight = DOM.elid('flight-number').value;
+
+            // Passenger Payment
+            // Passengers may pay up to 1 ether for purchasing flight insurance.
+            let ethValue = DOM.elid('eth-value').value;
+            
+            console.log("purchase-flight-insurance",flight, ethValue);
+
+            contract.purchaseFlightInsurance(flight, ethValue, (error, result) => {
+                display('Oracles', 'Trigger oracles', [ { label: 'Purchase Flight Insurance', error: error, value: result.flight + ' ' + result.timestamp} ]);
+            });
+        })
+
+        // claim repayment and withdraw
+        DOM.elid('claim-repayment').addEventListener('click', () => {
+            const flight = DOM.elid('flight-address').value;
+            // Passenger Repayment
+            // If flight is delayed due to airline fault, passenger receives credit of 1.5X the amount they paid
+            
+            // Passenger Withdraw
+            // Passenger can withdraw any funds owed to them as a result of receiving credit for insurance payout
+
+            // FIXME: ??????????????????????
+            // Insurance Payouts
+            // Insurance payouts are not sent directly to passenger’s wallet
+
+            contract.claimRepayment(flight, (error, result) => {
+                display('Oracles', 'Trigger oracles', [ { label: 'Claim Repayment', error: error, value: result.flight + ' ' + result.timestamp} ]);
+            });
+        })
     });
     
 

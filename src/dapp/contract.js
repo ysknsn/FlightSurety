@@ -53,4 +53,44 @@ export default class Contract {
                 callback(error, payload);
             });
     }
+
+    purchaseFlightInsurance(flight, ethValue, callback) {
+        let self = this;
+        let payload = {
+            airline: self.airlines[0],
+            flight: flight,
+            timestamp: Math.floor(Date.now() / 1000),
+            ethValue: ethValue
+        }
+
+        self.flightSuretyApp.methods
+            .purchaseFlightInsurance(
+                payload.airline,
+                payload.flight,
+                payload.timestamp,
+                payload.ethValue
+            ).send({ from: self.owner}, (error, result) => {
+                callback(error, payload);
+            });
+    }
+
+    claimRepayment(flight, callback) {
+        let self = this;
+        let payload = {
+            airline: self.airlines[0],
+            flight: flight,
+            timestamp: Math.floor(Date.now() / 1000),
+            address: self.passengers[0],
+        }
+
+        self.flightSuretyApp.methods
+            .refundEth(
+                payload.airline,
+                payload.flight,
+                payload.timestamp,
+                payload.address
+            ).send({ from: self.owner}, (error, result) => {
+                callback(error, payload);
+            });
+    }
 }
