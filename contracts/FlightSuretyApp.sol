@@ -418,28 +418,9 @@ contract FlightSuretyApp {
     }
 
     function setOperatingStatus(bool mode) external requireContractOwner {
-        require(
-            mode != operational,
-            "New mode must be different from existing mode"
-        );
-        require(userProfiles[msg.sender].isAdmin, "Caller is not an admin");
-
-        bool isDuplicate = false;
-        for (uint256 c = 0; c < multiCalls.length; c++) {
-            if (multiCalls[c] == msg.sender) {
-                isDuplicate = true;
-                break;
-            }
-        }
-
-        // Prevent double voting
-        require(!isDuplicate, "Caller has already called this funciton.");
-
-        multiCalls.push(msg.sender);
-        if (multiCalls.length >= M) {
-            operational = mode;
-            multiCalls = new address[](0);
-        }
+        // setOperatingStatus does not have to implement multiparty
+        // The function setOperatingStatus is already implemented in the boilerplate and there it no need to do anything else
+        operational = mode;
     }
     // endregion
 }
