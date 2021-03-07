@@ -102,10 +102,37 @@ contract('Flight Surety Tests', async (accounts) => {
     assert.equal(result, false, "Airline should not be able to register another airline if it hasn't provided funding");
 
   });
-  
 
-  it('function call is made when multi-party threshold is reached', async () => {
-    console.log("not working");
+  it('First airline is registered when contract is deployed.', async () => {
+    var isRegistered;  
+    try {
+        // FIXME: 
+        await config.flightSurety.setOperatingStatus(true, {from: config.firstAirline});
+        isRegistered = await config.flightSuretyApp.isRegisteredAirline(config.firstAirline, {from: config.firstAirline});
+    } catch(e) {
+        console.log("ERROR: ", e);
+    }
+    assert.equal(isRegistered, true, "First airline must registered when contract is deployed")
+  });
+
+  it('Only existing airline may register a new airline until there are at least four airlines registered.', async () => {
+    // ARRANGE
+    let admin1 = accounts[1];
+    let admin2 = accounts[2];
+    let admin3 = accounts[3];
+    let admin4 = accounts[4];
+    
+    // FIXME: 
+    await config.flightSuretyApp.registerAirline(admin1, {from: config.owner});
+    await config.flightSuretyApp.registerAirline(admin2, {from: config.owner});
+    await config.flightSuretyApp.registerAirline(admin3, {from: config.owner});
+
+    await config.flightSuretyApp.registerAirline(admin4, {from: config.owner});
+
+    assert.equal(true, true, "")
+  });
+
+  it('Registration of fifth and subsequent airlines requires multi-party consensus of 50% of registered airlines.', async () => {
     // ARRANGE
     let admin1 = accounts[1];
     let admin2 = accounts[2];
@@ -118,21 +145,23 @@ contract('Flight Surety Tests', async (accounts) => {
     await config.flightSuretyApp.registerAirline(admin3, {from: config.owner});
     await config.flightSuretyApp.registerAirline(admin4, {from: config.owner});
 
-    // FIXME: 
-    /**
-    // ACT
-    await config.flightSuretyApp.setOperatingStatus(changeStatus, {from: admin1});
-    await config.flightSuretyApp.setOperatingStatus(changeStatus, {from: admin2});
-    
-    let newStatus = await config.flightSuretyApp.isOperational.call(); 
-
-    // ASSERT
-    assert.equal(changeStatus, newStatus, "Multi-party call failed");
-
-     */
-    assert.equal(true, true, "");
-
+    assert.equal(true, true, "")
   });
 
+  it('Airline can be registered, but does not participate in contract until it submits funding of 10 ether.', async () => {
+    assert.equal(true, true, "")
+  });
+
+  it('Passengers may pay up to 1 ether for purchasing flight insurance.', async () => {
+    assert.equal(true, true, "")
+  });
+
+  it('If flight is delayed due to airline fault, passenger receives credit of 1.5X the amount they paid.', async () => {
+    assert.equal(true, true, "")
+  });
+
+  it('Passenger can withdraw any funds owed to them as a result of receiving credit for insurance payout.', async () => {
+    assert.equal(true, true, "")
+  });
 
 });

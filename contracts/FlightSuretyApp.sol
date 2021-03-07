@@ -132,6 +132,9 @@ contract FlightSuretyApp {
      */
 
     function registerAirline(address airlineAddress) external returns (bool success, uint256 votes) {
+        
+        // FIXME: not working
+
         bool isDuplicate = false;
         for (uint256 c = 0; c < multiCalls.length; c++) {
             if (multiCalls[c] == msg.sender) {
@@ -148,6 +151,13 @@ contract FlightSuretyApp {
         }
         return (success, 0);
     }
+
+    /**
+        * @dev This is used to check if the Airline is registered in Test
+     */ 
+    function isRegisteredAirline(address airlineAddress) external returns (bool) {
+        return flightSuretyData.isRegisteredAirline(airlineAddress);
+    }    
 
     /**
      * @dev Register a future flight for insuring.
@@ -175,7 +185,9 @@ contract FlightSuretyApp {
         uint256 timestamp,
         uint8 statusCode,
         bool verified
-    ) internal {}
+    ) internal {
+        // FIXME: I'm not sure what I have to do with this Function.
+    }
 
     // Generate a request for oracles to fetch flight information
     function fetchFlightStatus(
@@ -197,18 +209,14 @@ contract FlightSuretyApp {
     }
 
     function purchaseFlightInsurance(
-        address airline,
-        string flight,
-        uint256 timestamp,
-        uint8 ethValue
+        address passengersAddress,
+        address airlineAddress,
+        uint256 purchasedAmount
     ) external {
-        // FIXME:
         flightSuretyData.purchaseFlightInsurance(
-            airline,
-            flight,
-            timestamp,
-            ethValue,
-            msg.sender
+            passengersAddress,
+            airlineAddress,
+            purchasedAmount
         );
     }
 
@@ -221,9 +229,6 @@ contract FlightSuretyApp {
     ) external {
         // FIXME:
         flightSuretyData.payoutFundsToInsuree(
-            airlineAddress,
-            flightAddress,
-            timestamp,
             passengersAddress
         );
     }
@@ -430,11 +435,9 @@ contract FlightSuretyData {
 
     // buy()
     function purchaseFlightInsurance(
-        address airline,
-        string flight,
-        uint256 timestamp,
-        uint8 ethValue,
-        address passengersAddress
+        address passengersAddress,
+        address airlineAddress,
+        uint256 purchasedAmount
     ) external;
 
     // ???
@@ -442,12 +445,11 @@ contract FlightSuretyData {
 
     // pay()
     function payoutFundsToInsuree(
-        address airlineAddress,
-        address flightAddress,
-        uint256 timestamp,
         address passengersAddress
     ) external;
 
     // fund()
     function initialFunding() external;
+
+    function isRegisteredAirline(address airlineAddress) external returns (bool);
 }

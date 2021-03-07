@@ -13,17 +13,29 @@ contract FlightSuretyData {
     bool private operational = true; // Blocks all state changes throughout the contract if false
 
     // The Data contract will hold the fund
-    uint256 private totalFundedEth = 0 ether;
+    uint256 private funds = 0 ether;
 
     mapping(address => Airline) airlines;
+
+    // store all insurance status.
+    mapping(address => Insurance) insurances;
+
     mapping(address => uint256) authorizedContracts;
 
     //Every new airline that is registered is not funded. The airlines need to submit their funds after registration
-    //Every airline that want to register another airline needs to be funded. If A wants to register B, then A must be a register airline that already paid the funds
+    //Every airline that want to register another airline needs to be funded.
+    //If A wants to register B, then A must be a register airline that already paid the funds
     struct Airline {
         bool isRegistered;
-        address airlineaddress;
-        // bool isFunded;
+        bool isFunded;
+        address airlineAddress;
+    }
+
+    struct Insurance {
+        address passengersAddress;
+        bool isPaid;
+        uint256 purchasedAmount;
+        address airlineAddress;
     }
 
     /********************************************************************************************/
@@ -106,10 +118,17 @@ contract FlightSuretyData {
      */
 
     function registerAirline(address airlineAddress) external {
-        airlines[msg.sender] = Airline({
-            isRegistered: true,
-            airlineaddress: airlineAddress
-        });
+        // require(airlines[msg.sender].isFunded, "This airline has no funsds");
+        airlines[airlineAddress].isRegistered = true;
+        airlines[airlineAddress].airlineAddress = airlineAddress;
+    }
+
+    function isRegisteredAirline(address airlineAddress) returns (bool) {  
+        // FIXME: I don't know how to check if the mapping exists.
+        // bool isExists = bytes(airlines[airlineAddress]).length > 0;
+        // require(isExists, "There is no Airline with that address.");
+
+        return airlines[airlineAddress].isRegistered;
     }
 
     /**
@@ -117,22 +136,29 @@ contract FlightSuretyData {
      *
      */
 
-    function purchaseFlightInsurance() external payable {
+    function purchaseFlightInsurance(address passengersAddress, address airlineAddress, uint256 purchasedAmount) external payable {
         // buy – buy insurance for one flight for one person
         // buyInsurance let's the passenger to buy an insurance. It works like this:
         // Passenger pays and the ether is stored in the FlightSuretyData contract >> FlightSuretyData registers the insurance
 
-        
+        // passengersAddress
+        insurances[passengersAddress] = Insurance({
+            passengersAddress: passengersAddress,
+            isPaid: false, 
+            purchasedAmount: purchasedAmount,
+            airlineAddress: airlineAddress
+        });
+        funds = funds + purchasedAmount;
     }
 
     /**
      *  @dev Credits payouts to insurees
      */
-    function creditInsurees() external pure {
-        // creditInsurees – credit all insurees of one flight
+    function creditInsurees() external {
+        // creditInsurees – credit all insurees of one fligh
 
-
-        // TODO: I don't know what this function is used for.
+        // FIXME: I don't know what this function is used for.
+        // What exactly does "credit" mean?
     }
 
     /**
@@ -140,15 +166,28 @@ contract FlightSuretyData {
      *
      */
     function payoutFundsToInsuree(
-        address airlineAddress,
-        address flightAddress,
-        uint256 timestamp,
         address passengersAddress
-    ) external pure {
+    ) external {
         // pay – you should check that we have enough money for payment using require()
+        uint256 purchasedAmount = insurances[passengersAddress].purchasedAmount;
+        // FIXME: TypeError: Operator * not compatible with types uint256 and rational_const 3 / 2
+        uint256 payoutAmount = purchasedAmount;// * 1.5;
+        require(funds >= payoutAmount, "There is not enough ETH to payout");
+
+        insurances[passengersAddress].isPaid = true;
+        funds = funds - payoutAmount;
+        passengersAddress.transfer(payoutAmount);
     }
 
-    // function fund() {}
+    function fund(address airlineAddress) public payable {
+        // Airline can be registered, but does not participate in contract until it submits funding of 10 ether
+        require(msg.value >= 10, "You must have a minimum of 10 eth to register.");
+
+        // FIXME: 
+        funds = funds + msg.value;
+        airlines[airlineAddress].isFunded = true;
+        airlines[airlineAddress].airlineAddress = airlineAddress;
+    }
 
     /**
      * @dev Initial funding for the insurance. Unless there are too many delayed flights
@@ -156,13 +195,16 @@ contract FlightSuretyData {
      *
      */
 
-    function initialFunding() public payable {}
+    function initialFunding() public payable {
+        // FIXME: 
+        funds = funds + msg.value;
+    }
 
     function getFlightKey(
         address airline,
         string memory flight,
         uint256 timestamp
-    ) internal pure returns (bytes32) {
+    ) internal returns (bytes32) {
         return keccak256(abi.encodePacked(airline, flight, timestamp));
     }
 
@@ -171,17 +213,15 @@ contract FlightSuretyData {
      *
      */
     // function() external payable {
-    //     fund();
+        // FIXME: This line makes an ERROR
+        // fund();
     // }
 
     function isAirline(address airline) public view returns (bool) {
         return airlines[airline].isRegistered;
     }
 
-    function authorizeContracts(address dataContracts)
-        external
-        requireContractOwner
-    {
+    function authorizeContracts(address dataContracts) external requireContractOwner {
         authorizedContracts[dataContracts] = 1;
     }
 
